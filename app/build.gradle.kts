@@ -5,6 +5,7 @@ plugins {
     id("kotlin-parcelize")
     id("dagger.hilt.android.plugin")
     id("androidx.navigation.safeargs")
+    id("com.google.protobuf")
 }
 
 android {
@@ -42,6 +43,23 @@ android {
         viewBinding = true
         dataBinding =  true
     }
+
+    protobuf {
+        protoc {
+            artifact = "com.google.protobuf:protoc:3.21.7"
+        }
+
+        generateProtoTasks {
+            all().forEach() { task ->
+                task.builtins {
+                    create("java") {
+                        option("lite")
+                    }
+                }
+            }
+        }
+    }
+
 }
 
 dependencies {
@@ -77,14 +95,8 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.4")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.4")
 
-    //Lottie
-    implementation("com.airbnb.android:lottie:6.1.0")
-
-    // Room
-    implementation("androidx.room:room-runtime:2.5.2")
-    kapt("androidx.room:room-compiler:2.5.2")
-    //Kotlin Extensions and Coroutines support for Room
-    implementation("androidx.room:room-ktx:2.5.2")
+    implementation("androidx.datastore:datastore:1.0.0")
+    implementation("com.google.protobuf:protobuf-javalite:3.24.4")
 
 }
 
