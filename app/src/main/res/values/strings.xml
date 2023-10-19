@@ -2,4 +2,19 @@
     <string name="app_name">MyTaskManager</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string-array name="categories">
+        <item>General</item>
+        <item>Personal</item>
+        <item>Family</item>
+        <item>Fun</item>
+        <item>Games</item>
+        <item>Tour</item>
+    </string-array>
+
+    <string-array name="priorities">
+        <item>High</item>
+        <item>Medium</item>
+        <item>Low</item>
+    </string-array>
 </resources>

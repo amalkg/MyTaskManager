@@ -4,14 +4,15 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.cns.mytaskmanager.data.model.TaskListResponse
+import com.cns.mytaskmanager.data.model.Todos
 import com.cns.mytaskmanager.databinding.ItemTaskBinding
 import javax.inject.Inject
 
 class TaskListAdapter @Inject constructor() : RecyclerView.Adapter<TaskViewHolder>() {
 
-    private var todoList = mutableListOf<TaskListResponse.Todos>()
+    private var todoList = mutableListOf<Todos>()
 
-    fun setTaskList(tasks: List<TaskListResponse.Todos>) {
+    fun setTaskList(tasks: List<Todos>) {
         this.todoList = tasks.toMutableList()
         notifyDataSetChanged()
     }

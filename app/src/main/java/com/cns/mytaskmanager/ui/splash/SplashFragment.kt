@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.cns.mytaskmanager.R
 import com.cns.mytaskmanager.databinding.FragmentSplashBinding
+import com.cns.mytaskmanager.utils.safeNavigate
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -29,7 +30,9 @@ class SplashFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         splashViewModel.delay.observe(viewLifecycleOwner) {
-            findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
+            safeNavigate(
+                SplashFragmentDirections.actionSplashFragmentToHomeFragment()
+            )
         }
 
 //        binding.welcome.setOnClickListener {
