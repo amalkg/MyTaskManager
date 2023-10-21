@@ -11,7 +11,7 @@ Task Manager App is a simple Android application that allows users to create, ma
 
 ## Features
 - Create tasks with detailed descriptions, category, priority and deadlines.
-- Set reminders for each tasks.
+- Reminders for each tasks.
 - Mark tasks as complete when finished.
 - Delete and update tasks.
 
