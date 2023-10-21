@@ -38,7 +38,7 @@ object DbModule {
         override suspend fun writeTo(t: TodoList, output: OutputStream) = t.writeTo(output)
     }
 
-    val Context.todoListDataStore: DataStore<TodoList> by dataStore(
+    private val Context.todoListDataStore: DataStore<TodoList> by dataStore(
         fileName = "TodoList.pb",
         serializer = TodoListSerializer
     )

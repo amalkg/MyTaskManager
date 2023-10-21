@@ -5,12 +5,16 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cns.mytaskmanager.Todo
+import com.cns.mytaskmanager.data.BaseResult
 import com.cns.mytaskmanager.data.DataStoreRepository
 import com.cns.mytaskmanager.data.MainRepository
+import com.cns.mytaskmanager.data.model.TaskListResponse
 import com.cns.mytaskmanager.data.model.Todos
 import com.cns.mytaskmanager.utils.capitalizeFirstLetter
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,7 +32,8 @@ class HomeViewModel @Inject constructor(
 
     val todoList: LiveData<List<Todo>> = _todoList
 
-    val todoListFromApi = MutableLiveData<List<Todos>>()
+    private val _todoListFromApi = MutableLiveData<BaseResult<Response<TaskListResponse>>>()
+    val todoListFromApi: LiveData<BaseResult<Response<TaskListResponse>>> = _todoListFromApi
 
     fun getTodoList() = viewModelScope.launch {
         _todoList = dataRepository.getTodoList()
@@ -47,13 +52,13 @@ class HomeViewModel @Inject constructor(
     }
 
     fun fetchTaskList() {
-        viewModelScope.launch {
-            kotlin.runCatching {
-                mainRepository.getTaskList()
-            }.onSuccess {
-                todoListFromApi.postValue(it.body()?.todos)
+        viewModelScope.launch(Dispatchers.IO) {
+            _todoListFromApi.postValue(BaseResult.Loading)
+            try {
+                val result = mainRepository.getTaskList()
+                _todoListFromApi.postValue(BaseResult.Success(result))
                 clearAllTodoList()
-                for (todo in it.body()?.todos!!) {
+                for (todo in result.body()?.todos!!) {
                     println(todo.title)
                     addTodoList(
                         listOf(
@@ -71,10 +76,9 @@ class HomeViewModel @Inject constructor(
                     )
                 }
 
-            }.onFailure {
-                println("falied" + it.message)
+            } catch (e: Exception) {
+                _todoListFromApi.postValue(BaseResult.Error(e))
             }
-
         }
     }
 }

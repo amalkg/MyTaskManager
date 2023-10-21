@@ -15,14 +15,17 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import com.cns.mytaskmanager.MainActivity
 import com.cns.mytaskmanager.R
 import com.cns.mytaskmanager.Todo
+import com.cns.mytaskmanager.data.BaseResult
 import com.cns.mytaskmanager.data.model.Todos
 import com.cns.mytaskmanager.databinding.FragmentHomeBinding
 import com.cns.mytaskmanager.utils.PriorityComparatorHighLow
 import com.cns.mytaskmanager.utils.PriorityComparatorLowHigh
 import com.cns.mytaskmanager.utils.bottom_sheet.BottomSheetFilterListDialogFragment
 import com.cns.mytaskmanager.utils.bottom_sheet.BottomSheetSortListDialogFragment
+import com.cns.mytaskmanager.utils.hide
 import com.cns.mytaskmanager.utils.safeNavigate
 import com.cns.mytaskmanager.utils.setCustomClickListener
+import com.cns.mytaskmanager.utils.show
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -108,19 +111,32 @@ class HomeFragment : Fragment(), BottomSheetFilterListDialogFragment.OnItemClick
             todosOriginal = arrayListOf()
             todosOriginal.addAll(list)
             if (list.isNullOrEmpty()) {
-//                binding.constraintLayout3.hide()
-//                binding.lytNoItems.show()
                 homeViewModel.fetchTaskList()
             } else {
-//                binding.lytNoItems.hide()
-//                binding.constraintLayout3.show()
+                binding.layoutNoData.hide()
+                binding.recyclerviewTaskList.show()
+                binding.progressIndicator.hide()
                 taskAdapter?.submitList(list)
                 taskAdapter?.notifyDataSetChanged()
             }
         }
 
         homeViewModel.todoListFromApi.observe(viewLifecycleOwner) {
-
+            when (it) {
+                is BaseResult.Success -> {
+                    binding.progressIndicator.hide()
+                    binding.recyclerviewTaskList.show()
+                }
+                is BaseResult.Error -> {
+                    println(it.exception)
+                    binding.layoutNoData.show()
+                }
+                BaseResult.Loading -> {
+                    binding.progressIndicator.show()
+                    binding.recyclerviewTaskList.hide()
+                    binding.layoutNoData.hide()
+                }
+            }
         }
     }
 
@@ -187,8 +203,16 @@ class HomeFragment : Fragment(), BottomSheetFilterListDialogFragment.OnItemClick
     private fun getSortedListByDate(): List<Todo> = todosOriginal.sortedWith(compareBy { it.date })
 
     private fun replaceItems(items: List<Todo>) {
-        taskAdapter?.submitList(items)
-        binding.recyclerviewTaskList.smoothScrollToPosition(0)
+        if (items.isNotEmpty()) {
+            binding.layoutNoData.hide()
+            binding.recyclerviewTaskList.show()
+            taskAdapter?.submitList(items)
+            binding.recyclerviewTaskList.smoothScrollToPosition(0)
+        } else {
+            binding.recyclerviewTaskList.hide()
+            binding.layoutNoData.show()
+        }
+
     }
 
     override fun onFilterItemClick(item: String) {
