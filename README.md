@@ -23,6 +23,7 @@ Task Manager App is a simple Android application that allows users to create, ma
 - Datastore
 - Alarm manager
 - Local notification
+- Unit test
 
 ## Author
 - Amal K G
