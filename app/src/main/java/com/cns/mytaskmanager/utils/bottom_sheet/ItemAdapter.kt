@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.cns.mytaskmanager.databinding.ItemBottomSheetBinding
 
-class ItemAdapter(private val items: List<String>, private val onItemClick: (String) -> Unit) :
+class ItemAdapter(private val items: List<String?>, private val onItemClick: (String) -> Unit) :
     RecyclerView.Adapter<ItemAdapter.ItemViewHolder>() {
 
     inner class ItemViewHolder(private val binding: ItemBottomSheetBinding) :
@@ -25,7 +25,7 @@ class ItemAdapter(private val items: List<String>, private val onItemClick: (Str
     }
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
-        holder.bind(items[position])
+        holder.bind(items[position].toString())
     }
 
     override fun getItemCount(): Int {

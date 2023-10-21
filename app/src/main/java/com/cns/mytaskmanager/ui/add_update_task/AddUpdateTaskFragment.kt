@@ -62,9 +62,9 @@ class AddUpdateTaskFragment : Fragment() {
 
     private fun initView() {
         if (args.todoItem != null) {
-            binding.toolbarTitle.text = "Update task"
-            binding.btnSubmit.text = "Update"
-            binding.btnCancel.text = "Delete"
+            binding.toolbarTitle.text = getString(R.string.update_task)
+            binding.btnSubmit.text = getString(R.string.update)
+            binding.btnCancel.text = getString(R.string.delete)
             binding.checkboxStatus.show()
             binding.etTitle.setText(args.todoItem!!.title)
             binding.etNote.setText(args.todoItem!!.todo)
@@ -73,9 +73,9 @@ class AddUpdateTaskFragment : Fragment() {
             binding.autoCompletePriority.setText(args.todoItem!!.priority)
             binding.checkboxStatus.isChecked = args.todoItem!!.completed
         } else {
-            binding.toolbarTitle.text = "Add task"
-            binding.btnSubmit.text = "Submit"
-            binding.btnCancel.text = "Cancel"
+            binding.toolbarTitle.text = getString(R.string.add_task)
+            binding.btnSubmit.text = getString(R.string.add_task)
+            binding.btnCancel.text = getString(R.string.cancel)
             binding.checkboxStatus.hide()
         }
 

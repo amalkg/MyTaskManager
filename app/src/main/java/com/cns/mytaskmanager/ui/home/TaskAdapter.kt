@@ -2,8 +2,6 @@ package com.cns.mytaskmanager.ui.home
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Filter
-import android.widget.Filterable
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -48,7 +46,12 @@ class TaskAdapter(val onClickTask: (Todo) -> Unit) :
             binding.tvTitle.text = item.title
             binding.tvDate.text = item.date
             binding.tvStatus.text =
-                String.format(" %s", if (item.completed) "Completed" else "Pending")
+                String.format(
+                    " %s",
+                    if (item.completed) binding.root.context.getString(R.string.completed) else binding.root.context.getString(
+                        R.string.pending
+                    )
+                )
             binding.tvStatus.apply {
                 setTextColor(
                     if (item.completed) ContextCompat.getColor(

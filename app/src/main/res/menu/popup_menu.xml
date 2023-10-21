@@ -3,14 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_all"
-        android:title="All"
+        android:title="@string/all"
         app:showAsAction="never"/>
     <item
         android:id="@+id/action_completed"
-        android:title="Completed"
+        android:title="@string/completed"
         app:showAsAction="never"/>
     <item
         android:id="@+id/action_pending"
-        android:title="Pending"
+        android:title="@string/pending"
         app:showAsAction="never"/>
 </menu>
