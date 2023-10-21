@@ -11,10 +11,20 @@
         android:label="AddUpdateTaskFragment"
         tools:layout="@layout/fragment_add_update_task">
         <argument
-            android:name="taskItem"
+            android:name="todoItem"
             app:argType="com.cns.mytaskmanager.data.model.Todos"
             app:nullable="true" />
+        <argument
+            android:name="position"
+            app:argType="integer" />
     </fragment>
+
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.cns.mytaskmanager.ui.search.SearchFragment"
+        android:label="SearchFragment"
+        tools:layout="@layout/fragment_search" />
+
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.cns.mytaskmanager.ui.home.HomeFragment"
@@ -23,6 +33,10 @@
         <action
             android:id="@+id/action_homeFragment_to_addUpdateTaskFragment"
             app:destination="@id/addUpdateTaskFragment" />
+
+        <action
+            android:id="@+id/action_homeFragment_to_searchFragment"
+            app:destination="@id/searchFragment" />
     </fragment>
     <fragment
         android:id="@+id/splashFragment"

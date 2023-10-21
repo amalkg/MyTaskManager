@@ -13,6 +13,9 @@ import androidx.navigation.NavDirections
 import androidx.navigation.Navigator
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.findNavController
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.util.Random
 
 fun Fragment.safeNavigate(
     directions: NavDirections,
@@ -54,6 +57,15 @@ fun Fragment.hideKeyboard() {
         }
     }
 }
+
+fun Fragment.showKeyboard(view: View) {
+    lifecycleScope.launch {
+        delay(50)
+        val window = requireActivity().window
+        val ime = WindowInsetsCompat.Type.ime()
+        WindowCompat.getInsetsController(window, view).show(ime)
+    }
+}
 fun isNetworkAvailable(context: Context) =
     (context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager).run {
         getNetworkCapabilities(activeNetwork)?.run {
@@ -62,3 +74,10 @@ fun isNetworkAvailable(context: Context) =
                     || hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
         } ?: false
     }
+
+fun capitalizeFirstLetter(input: String): String {
+    if (input.isEmpty()) {
+        return input
+    }
+    return input.substring(0, 1).uppercase() + input.substring(1)
+}

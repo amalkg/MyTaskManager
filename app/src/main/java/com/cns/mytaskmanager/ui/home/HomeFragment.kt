@@ -1,32 +1,37 @@
 package com.cns.mytaskmanager.ui.home
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.cns.mytaskmanager.R
+import com.cns.mytaskmanager.Todo
 import com.cns.mytaskmanager.data.model.Todos
 import com.cns.mytaskmanager.databinding.FragmentHomeBinding
-import com.cns.mytaskmanager.utils.FilterByStatusType
+import com.cns.mytaskmanager.utils.PriorityComparatorHighLow
+import com.cns.mytaskmanager.utils.PriorityComparatorLowHigh
+import com.cns.mytaskmanager.utils.bottom_sheet.BottomSheetFilterListDialogFragment
+import com.cns.mytaskmanager.utils.bottom_sheet.BottomSheetSortListDialogFragment
 import com.cns.mytaskmanager.utils.safeNavigate
 import com.cns.mytaskmanager.utils.setCustomClickListener
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment(), BottomSheetFilterListDialogFragment.OnItemClickListener,
+    BottomSheetSortListDialogFragment.OnItemClickListener {
     private val homeViewModel: HomeViewModel by viewModels()
     private lateinit var binding: FragmentHomeBinding
 
     private var taskAdapter: TaskAdapter? = null
 
-    private var todosOriginal: ArrayList<Todos> = ArrayList()
-
-    private var fabVisible = false
+    private var todosOriginal: ArrayList<Todo> = ArrayList()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,54 +48,35 @@ class HomeFragment : Fragment() {
         setupRecyclerView()
         setupObservables()
         setupClickListeners()
-        homeViewModel.fetchTaskList()
     }
 
     private fun setupClickListeners() {
-        binding.idFABEdit.setCustomClickListener {
-            if (!fabVisible) {
-                binding.idFABAdd.show()
-                binding.idFABFilter.show()
-                binding.idFABSort.show()
-
-                binding.idFABEdit.setImageDrawable(context?.let { it1 ->
-                    ContextCompat.getDrawable(
-                        it1, R.drawable.ic_close
-                    )
-                })
-
-                fabVisible = true
-            } else {
-                binding.idFABAdd.hide()
-                binding.idFABFilter.hide()
-                binding.idFABSort.hide()
-
-                binding.idFABEdit.setImageDrawable(context?.let { it1 ->
-                    ContextCompat.getDrawable(
-                        it1, R.drawable.ic_edit
-                    )
-                })
-
-                fabVisible = false
-            }
-        }
-
-
-        binding.idFABAdd.setCustomClickListener {
+        binding.imageAdd.setCustomClickListener {
             safeNavigate(
                 HomeFragmentDirections
-                    .actionHomeFragmentToAddUpdateTaskFragment(
-                        null
-                    )
+                    .actionHomeFragmentToAddUpdateTaskFragment(null, 0)
             )
-        }
-
-        binding.idFABFilter.setCustomClickListener {
-
         }
 
         binding.imageThreeDot.setCustomClickListener {
             showPopUpMenu()
+        }
+
+        binding.layoutFilter.setCustomClickListener {
+            val bottomSheetDialog = BottomSheetFilterListDialogFragment(this)
+            bottomSheetDialog.show(childFragmentManager, "BottomSheetDialog")
+        }
+
+        binding.layoutSort.setCustomClickListener {
+            val bottomSheetDialog = BottomSheetSortListDialogFragment(this)
+            bottomSheetDialog.show(childFragmentManager, "BottomSheetDialog")
+        }
+
+        binding.etSearch.setCustomClickListener {
+            safeNavigate(
+                HomeFragmentDirections
+                    .actionHomeFragmentToSearchFragment()
+            )
         }
     }
 
@@ -100,31 +86,38 @@ class HomeFragment : Fragment() {
         popupMenu?.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.action_all ->
-                    filterByStatus(FilterByStatusType.ALL)
+                    replaceItems(todosOriginal)
 
                 R.id.action_completed ->
-                    filterByStatus(FilterByStatusType.COMPLETED)
+                    replaceItems(getListByStatus(true))
 
                 R.id.action_pending ->
-                    filterByStatus(FilterByStatusType.PENDING)
+                    replaceItems(getListByStatus(false))
             }
             true
         }
         popupMenu?.show()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun setupObservables() {
-        homeViewModel.taskList.observe(viewLifecycleOwner) { list ->
+        homeViewModel.todoList.observe(viewLifecycleOwner) { list ->
             todosOriginal = arrayListOf()
             todosOriginal.addAll(list)
             if (list.isNullOrEmpty()) {
 //                binding.constraintLayout3.hide()
 //                binding.lytNoItems.show()
+                homeViewModel.fetchTaskList()
             } else {
 //                binding.lytNoItems.hide()
 //                binding.constraintLayout3.show()
                 taskAdapter?.submitList(list)
+                taskAdapter?.notifyDataSetChanged()
             }
+        }
+
+        homeViewModel.todoListFromApi.observe(viewLifecycleOwner) {
+
         }
     }
 
@@ -132,35 +125,90 @@ class HomeFragment : Fragment() {
         taskAdapter = TaskAdapter { item ->
             onClickTask(item)
         }
-        binding.recyclerview.apply {
+        binding.recyclerviewTaskList.apply {
             setHasFixedSize(true)
             (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             adapter = taskAdapter
         }
+        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            override fun onMove(
+                v: RecyclerView,
+                h: RecyclerView.ViewHolder,
+                t: RecyclerView.ViewHolder
+            ) = false
+
+            override fun onSwiped(h: RecyclerView.ViewHolder, dir: Int) =
+                removeAt(h.adapterPosition)
+        }).attachToRecyclerView(binding.recyclerviewTaskList)
     }
 
-    private fun onClickTask(item: Todos) {
+    fun removeAt(index: Int) {
+        todosOriginal.removeAt(index)
+        homeViewModel.removeTodo(index)
+        taskAdapter?.notifyItemRemoved(index)
+    }
+
+    private fun onClickTask(item: Todo) {
+        val pos = todosOriginal.indexOf(item)
+        val todoItem = Todos(
+            id = item.id,
+            title = item.title,
+            category = item.category,
+            todo = item.todo,
+            completed = item.completed,
+            userId = item.userId,
+            date = item.date,
+            priority = item.priority,
+        )
         safeNavigate(
             HomeFragmentDirections
                 .actionHomeFragmentToAddUpdateTaskFragment(
-                    item
+                    todoItem,
+                    pos
                 )
         )
     }
 
-    private fun getCompletedList(): List<Todos> = todosOriginal.filter { it.completed }
+    private fun getListByCategory(category: String): List<Todo> =
+        todosOriginal.filter { it.category == category }
 
-    private fun getPendingList(): List<Todos> = todosOriginal.filter { !it.completed }
+    private fun getListByStatus(status: Boolean): List<Todo> =
+        todosOriginal.filter { it.completed == status }
 
-    private fun filterByStatus(filterByStatusType: FilterByStatusType) {
-        when (filterByStatusType) {
-            FilterByStatusType.ALL -> replaceSortedItems(todosOriginal)
-            FilterByStatusType.COMPLETED -> replaceSortedItems(getCompletedList())
-            FilterByStatusType.PENDING -> replaceSortedItems(getPendingList())
+    private fun getSortedListByPriorityHighLow(): List<Todo> =
+        todosOriginal.sortedWith(PriorityComparatorHighLow())
+
+    private fun getSortedListByPriorityLowHigh(): List<Todo> =
+        todosOriginal.sortedWith(PriorityComparatorLowHigh())
+
+    private fun getSortedListByDate(): List<Todo> = todosOriginal.sortedWith(compareBy { it.date })
+
+    private fun replaceItems(items: List<Todo>) {
+        taskAdapter?.submitList(items)
+        binding.recyclerviewTaskList.smoothScrollToPosition(0)
+    }
+
+    override fun onFilterItemClick(item: String) {
+        if (item == "All") {
+            replaceItems(todosOriginal)
+        } else {
+            replaceItems(getListByCategory(item))
         }
     }
 
-    private fun replaceSortedItems(items: List<Todos>) {
-        taskAdapter?.submitList(items)
+    override fun onSortItemClick(item: String) {
+        when (item) {
+            "Priority - High to low" -> {
+                replaceItems(getSortedListByPriorityHighLow())
+            }
+
+            "Priority - Low to high" -> {
+                replaceItems(getSortedListByPriorityLowHigh())
+            }
+
+            "Date" -> {
+                replaceItems(getSortedListByDate())
+            }
+        }
     }
 }

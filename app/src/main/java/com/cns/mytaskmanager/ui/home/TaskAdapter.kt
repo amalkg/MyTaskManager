@@ -2,28 +2,30 @@ package com.cns.mytaskmanager.ui.home
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.cns.mytaskmanager.R
-import com.cns.mytaskmanager.data.model.Todos
+import com.cns.mytaskmanager.Todo
 import com.cns.mytaskmanager.databinding.ItemTaskBinding
 import com.cns.mytaskmanager.utils.setCustomClickListener
 
-class TaskAdapter(val onClickTask: (Todos) -> Unit) :
-    ListAdapter<Todos, TaskAdapter.ViewHolder>(object :
-        DiffUtil.ItemCallback<Todos?>() {
+class TaskAdapter(val onClickTask: (Todo) -> Unit) :
+    ListAdapter<Todo, TaskAdapter.ViewHolder>(object :
+        DiffUtil.ItemCallback<Todo?>() {
         override fun areItemsTheSame(
-            oldItem: Todos,
-            newItem: Todos
+            oldItem: Todo,
+            newItem: Todo
         ): Boolean {
             return newItem.id == oldItem.id
         }
 
         override fun areContentsTheSame(
-            oldItem: Todos,
-            newItem: Todos
+            oldItem: Todo,
+            newItem: Todo
         ): Boolean {
             return newItem == oldItem
         }
@@ -58,10 +60,27 @@ class TaskAdapter(val onClickTask: (Todos) -> Unit) :
 
 
             binding.tagPriority.apply {
-                when(item.priority) {
-                    "High" -> setBackgroundColor(ContextCompat.getColor(context, R.color.color_red_high))
-                    "Medium" -> setBackgroundColor(ContextCompat.getColor(context, R.color.color_yellow_medium))
-                    "Low" -> setBackgroundColor(ContextCompat.getColor(context, R.color.color_blue_low))
+                when (item.priority) {
+                    "High" -> setBackgroundColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.color_red_high
+                        )
+                    )
+
+                    "Medium" -> setBackgroundColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.color_yellow_medium
+                        )
+                    )
+
+                    "Low" -> setBackgroundColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.color_blue_low
+                        )
+                    )
                 }
             }
 

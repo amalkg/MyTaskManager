@@ -97,6 +97,7 @@ dependencies {
 
     implementation("androidx.datastore:datastore:1.0.0")
     implementation("com.google.protobuf:protobuf-javalite:3.24.4")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
 
 }
 

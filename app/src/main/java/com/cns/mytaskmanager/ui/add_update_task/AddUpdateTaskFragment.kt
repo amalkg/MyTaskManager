@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.cns.mytaskmanager.R
+import com.cns.mytaskmanager.Todo
 import com.cns.mytaskmanager.databinding.FragmentAddUpdateTaskBinding
 import com.cns.mytaskmanager.utils.hide
 import com.cns.mytaskmanager.utils.hideKeyboard
@@ -46,18 +47,21 @@ class AddUpdateTaskFragment : Fragment() {
     }
 
     private fun initView() {
-        if (args.taskItem != null) {
+        if (args.todoItem != null) {
             binding.toolbarTitle.text = "Update task"
             binding.btnSubmit.text = "Update"
+            binding.btnCancel.text = "Delete"
             binding.checkboxStatus.show()
-            binding.etTitle.setText(args.taskItem!!.title)
-            binding.etNote.setText(args.taskItem!!.todo)
-            binding.etDate.setText(args.taskItem!!.date)
-            binding.autoCompleteCategory.setText(args.taskItem!!.category)
-            binding.autoCompletePriority.setText(args.taskItem!!.priority)
+            binding.etTitle.setText(args.todoItem!!.title)
+            binding.etNote.setText(args.todoItem!!.todo)
+            binding.etDate.setText(args.todoItem!!.date)
+            binding.autoCompleteCategory.setText(args.todoItem!!.category)
+            binding.autoCompletePriority.setText(args.todoItem!!.priority)
+            binding.checkboxStatus.isChecked = args.todoItem!!.completed
         } else {
             binding.toolbarTitle.text = "Add task"
             binding.btnSubmit.text = "Submit"
+            binding.btnCancel.text = "Cancel"
             binding.checkboxStatus.hide()
         }
 
@@ -70,10 +74,6 @@ class AddUpdateTaskFragment : Fragment() {
         val arrayAdapterPriority =
             context?.let { ArrayAdapter(it, R.layout.drop_down_item, priorities) }
         binding.autoCompletePriority.setAdapter(arrayAdapterPriority)
-
-        binding.etDate.setOnClickListener {
-            showDatePicker()
-        }
     }
 
     private fun setupClickListeners() {
@@ -81,17 +81,82 @@ class AddUpdateTaskFragment : Fragment() {
             hideKeyboard()
             findNavController().navigateUp()
         }
+        binding.autoCompleteCategory.setCustomClickListener {
+            hideKeyboard()
+        }
+        binding.autoCompletePriority.setCustomClickListener {
+            hideKeyboard()
+        }
+        binding.etDate.setCustomClickListener {
+            hideKeyboard()
+            showDatePicker()
+        }
         binding.btnCancel.setCustomClickListener {
+            if (args.todoItem != null) {
+                addUpdateTaskViewModel.removeTodo(args.position)
+            }
             hideKeyboard()
             findNavController().navigateUp()
         }
         binding.btnSubmit.setCustomClickListener {
-            validateData()
+            if (args.todoItem != null) {
+                updateTodoItem()
+            } else {
+                submitTodoItem()
+            }
         }
     }
 
-    private fun validateData() {
+    private fun updateTodoItem() {
+        val id = args.todoItem?.id
+        val title = binding.etTitle.text.toString().trim()
+        val category = binding.autoCompleteCategory.text.toString().trim()
+        val note = binding.etNote.text.toString().trim()
+        val completed = binding.checkboxStatus.isChecked
+        val date = binding.etDate.text.toString().trim()
+        val priority = binding.autoCompletePriority.text.toString().trim()
 
+        addUpdateTaskViewModel.updateTodo(
+            args.position,
+            Todo.newBuilder()
+                .setId(id!!)
+                .setTitle(title)
+                .setCategory(category)
+                .setTodo(note)
+                .setCompleted(completed)
+                .setUserId(1)
+                .setDate(date)
+                .setPriority(priority)
+                .build()
+        )
+
+        hideKeyboard()
+        findNavController().navigateUp()
+    }
+
+    private fun submitTodoItem() {
+        val title = binding.etTitle.text.toString().trim()
+        val category = binding.autoCompleteCategory.text.toString().trim()
+        val note = binding.etNote.text.toString().trim()
+        val date = binding.etDate.text.toString().trim()
+        val priority = binding.autoCompletePriority.text.toString().trim()
+
+
+        val randomInt = (100..100000).random()
+        addUpdateTaskViewModel.addTodo(
+            Todo.newBuilder()
+                .setId(randomInt)
+                .setTitle(title)
+                .setCategory(category)
+                .setTodo(note)
+                .setCompleted(false)
+                .setUserId(1)
+                .setDate(date)
+                .setPriority(priority)
+                .build()
+        )
+        hideKeyboard()
+        findNavController().navigateUp()
     }
 
     private fun showDatePicker() {

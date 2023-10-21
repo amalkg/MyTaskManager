@@ -1,4 +1,4 @@
-package com.cns.mytaskmanager.ui.splash
+package com.cns.mytaskmanager.ui.search
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -14,27 +14,28 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SplashViewModel @Inject constructor(
+class SearchViewModel @Inject constructor(
     private val mainRepository: MainRepository,
     private val dataRepository: DataStoreRepository
 ) :
     ViewModel() {
-
-    val delay = MutableLiveData<Boolean>()
-
     init {
-        splashDelay()
+        getTodoList()
     }
 
-    private fun splashDelay() {
-        viewModelScope.launch {
-            kotlin.runCatching {
-                delay(2000)
-            }.onSuccess {
-                delay.value = true
-            }.onFailure {
+    private lateinit var _todoList: LiveData<List<Todo>>
 
-            }
+    val todoList: LiveData<List<Todo>> = _todoList
+
+    val searchList = MutableLiveData<List<Todo>>()
+
+    fun getTodoList() = viewModelScope.launch {
+        _todoList = dataRepository.getTodoList()
+    }
+
+    fun filterList(query: String) {
+        searchList.value = _todoList.value?.filter {
+            it.title.contains(query, ignoreCase = true) //
         }
     }
 }

@@ -1,13 +1,11 @@
 package com.cns.mytaskmanager.ui.splash
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
-import com.cns.mytaskmanager.R
 import com.cns.mytaskmanager.databinding.FragmentSplashBinding
 import com.cns.mytaskmanager.utils.safeNavigate
 import dagger.hilt.android.AndroidEntryPoint
@@ -35,10 +33,6 @@ class SplashFragment : Fragment() {
             )
         }
 
-//        binding.welcome.setOnClickListener {
-//            // binding.welcome.text = "Hello 2"
-//            findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
-//        }
 
     }
 }
