@@ -15,6 +15,8 @@ import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
 import java.util.Random
 
 fun Fragment.safeNavigate(
@@ -80,4 +82,10 @@ fun capitalizeFirstLetter(input: String): String {
         return input
     }
     return input.substring(0, 1).uppercase() + input.substring(1)
+}
+
+fun String.convertDateToMilliseconds(inputFormat: String): Long {
+    val format = SimpleDateFormat(inputFormat, Locale.getDefault())
+    val date = format.parse(this)
+    return date?.time ?: 0
 }

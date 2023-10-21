@@ -99,6 +99,10 @@ dependencies {
     implementation("com.google.protobuf:protobuf-javalite:3.24.4")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
 
+    // WorkManager
+    implementation("androidx.work:work-runtime-ktx:2.7.0")
+
+
 }
 
 // Allow references to generated code
