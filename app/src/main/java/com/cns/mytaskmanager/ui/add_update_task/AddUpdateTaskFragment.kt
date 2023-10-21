@@ -2,35 +2,33 @@ package com.cns.mytaskmanager.ui.add_update_task
 
 import android.app.AlarmManager
 import android.app.DatePickerDialog
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.work.OneTimeWorkRequest
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.cns.mytaskmanager.R
 import com.cns.mytaskmanager.Todo
 import com.cns.mytaskmanager.databinding.FragmentAddUpdateTaskBinding
 import com.cns.mytaskmanager.utils.convertDateToMilliseconds
 import com.cns.mytaskmanager.utils.hide
 import com.cns.mytaskmanager.utils.hideKeyboard
-import com.cns.mytaskmanager.utils.notification.AlarmReceiver
+import com.cns.mytaskmanager.utils.notification.NotificationWorker
 import com.cns.mytaskmanager.utils.setCustomClickListener
 import com.cns.mytaskmanager.utils.show
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
 class AddUpdateTaskFragment : Fragment() {
@@ -56,7 +54,7 @@ class AddUpdateTaskFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initView()
-        createNotificationChannel()
+//        createNotificationChannel()
         setupClickListeners()
     }
 
@@ -90,19 +88,19 @@ class AddUpdateTaskFragment : Fragment() {
         binding.autoCompletePriority.setAdapter(arrayAdapterPriority)
     }
 
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name: CharSequence = "task-manager-notification-channel"
-            val description = "Channel for Alarm manager"
-            val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel("task-manager-notification", name, importance)
-            channel.description = description
-            val notificationManager = context?.getSystemService(
-                NotificationManager::class.java
-            )
-            notificationManager?.createNotificationChannel(channel)
-        }
-    }
+//    private fun createNotificationChannel() {
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            val name: CharSequence = "task-manager-notification-channel"
+//            val description = "Channel for Alarm manager"
+//            val importance = NotificationManager.IMPORTANCE_HIGH
+//            val channel = NotificationChannel("task-manager-notification", name, importance)
+//            channel.description = description
+//            val notificationManager = context?.getSystemService(
+//                NotificationManager::class.java
+//            )
+//            notificationManager?.createNotificationChannel(channel)
+//        }
+//    }
 
     private fun setupClickListeners() {
         binding.backArrow.setCustomClickListener {
@@ -133,16 +131,26 @@ class AddUpdateTaskFragment : Fragment() {
                 submitTodoItem()
             }
 
-            alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            val intent = Intent(context, AlarmReceiver::class.java)
-            pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-            val dateString = binding.etDate.text.toString() + " 09:00:00"
+            val dateString = binding.etDate.text.toString() + " 12:53:00"
             val inputFormat = "dd-MM-yyyy HH:mm:ss"
-            val milliseconds = dateString.convertDateToMilliseconds( inputFormat)
-            alarmManager.setRepeating(
-                AlarmManager.RTC_WAKEUP, milliseconds,
-                AlarmManager.INTERVAL_DAY, pendingIntent
-            )
+            val milliseconds = dateString.convertDateToMilliseconds(inputFormat)
+            val workRequest = OneTimeWorkRequest.Builder(NotificationWorker::class.java)
+                .setInitialDelay(milliseconds, TimeUnit.MILLISECONDS)
+                .build()
+
+            context?.let { it1 -> WorkManager.getInstance(it1).enqueue(workRequest) }
+
+
+//            alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+//            val intent = Intent(context, AlarmReceiver::class.java)
+//            pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+//            val dateString = binding.etDate.text.toString() + " 09:00:00"
+//            val inputFormat = "dd-MM-yyyy HH:mm:ss"
+//            val milliseconds = dateString.convertDateToMilliseconds( inputFormat)
+//            alarmManager.setRepeating(
+//                AlarmManager.RTC_WAKEUP, milliseconds,
+//                AlarmManager.INTERVAL_DAY, pendingIntent
+//            )
         }
     }
 
