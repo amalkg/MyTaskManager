@@ -13,7 +13,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -27,6 +26,7 @@ import com.cns.mytaskmanager.utils.hideKeyboard
 import com.cns.mytaskmanager.utils.notification.AlarmReceiver
 import com.cns.mytaskmanager.utils.setCustomClickListener
 import com.cns.mytaskmanager.utils.show
+import com.cns.mytaskmanager.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -49,6 +49,8 @@ class AddUpdateTaskFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentAddUpdateTaskBinding.inflate(inflater, container, false)
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = addUpdateTaskViewModel
         return binding.root
     }
 
@@ -57,7 +59,34 @@ class AddUpdateTaskFragment : Fragment() {
 
         initView()
         createNotificationChannel()
+        setupObservables()
         setupClickListeners()
+    }
+
+    private fun setupObservables() {
+        addUpdateTaskViewModel.isValidLiveData.observe(viewLifecycleOwner) { isValid ->
+            if (isValid) {
+                if (args.todoItem != null) {
+                    updateTodoItem()
+                } else {
+                    submitTodoItem()
+                }
+
+                alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                val intent = Intent(context, AlarmReceiver::class.java)
+                pendingIntent =
+                    PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+                val dateString = binding.etDate.text.toString() + " 09:00:00"
+                val inputFormat = "dd-MM-yyyy HH:mm:ss"
+                val milliseconds = dateString.convertDateToMilliseconds(inputFormat)
+                alarmManager.setRepeating(
+                    AlarmManager.RTC_WAKEUP, milliseconds,
+                    AlarmManager.INTERVAL_DAY, pendingIntent
+                )
+            } else {
+                context?.showToast("Please update all fields")
+            }
+        }
     }
 
     private fun initView() {
@@ -66,11 +95,11 @@ class AddUpdateTaskFragment : Fragment() {
             binding.btnSubmit.text = getString(R.string.update)
             binding.btnCancel.text = getString(R.string.delete)
             binding.checkboxStatus.show()
-            binding.etTitle.setText(args.todoItem!!.title)
-            binding.etNote.setText(args.todoItem!!.todo)
-            binding.etDate.setText(args.todoItem!!.date)
-            binding.autoCompleteCategory.setText(args.todoItem!!.category)
-            binding.autoCompletePriority.setText(args.todoItem!!.priority)
+            addUpdateTaskViewModel.titleLiveData.value = args.todoItem!!.title
+            addUpdateTaskViewModel.noteLiveData.value = args.todoItem!!.todo
+            addUpdateTaskViewModel.dateLiveData.value = args.todoItem!!.date
+            addUpdateTaskViewModel.categoryLiveData.value = args.todoItem!!.category
+            addUpdateTaskViewModel.priorityLiveData.value = args.todoItem!!.priority
             binding.checkboxStatus.isChecked = args.todoItem!!.completed
         } else {
             binding.toolbarTitle.text = getString(R.string.add_task)
@@ -127,71 +156,43 @@ class AddUpdateTaskFragment : Fragment() {
             findNavController().navigateUp()
         }
         binding.btnSubmit.setCustomClickListener {
-            if (args.todoItem != null) {
-                updateTodoItem()
-            } else {
-                submitTodoItem()
-            }
-
-            alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            val intent = Intent(context, AlarmReceiver::class.java)
-            pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-            val dateString = binding.etDate.text.toString() + " 09:00:00"
-            val inputFormat = "dd-MM-yyyy HH:mm:ss"
-            val milliseconds = dateString.convertDateToMilliseconds( inputFormat)
-            alarmManager.setRepeating(
-                AlarmManager.RTC_WAKEUP, milliseconds,
-                AlarmManager.INTERVAL_DAY, pendingIntent
-            )
+            addUpdateTaskViewModel.validateForm()
         }
     }
 
     private fun updateTodoItem() {
         val id = args.todoItem?.id
-        val title = binding.etTitle.text.toString().trim()
-        val category = binding.autoCompleteCategory.text.toString().trim()
-        val note = binding.etNote.text.toString().trim()
         val completed = binding.checkboxStatus.isChecked
-        val date = binding.etDate.text.toString().trim()
-        val priority = binding.autoCompletePriority.text.toString().trim()
 
         addUpdateTaskViewModel.updateTodo(
             args.position,
             Todo.newBuilder()
                 .setId(id!!)
-                .setTitle(title)
-                .setCategory(category)
-                .setTodo(note)
+                .setTitle(addUpdateTaskViewModel.titleLiveData.value)
+                .setCategory(addUpdateTaskViewModel.categoryLiveData.value)
+                .setTodo(addUpdateTaskViewModel.noteLiveData.value)
                 .setCompleted(completed)
                 .setUserId(1)
-                .setDate(date)
-                .setPriority(priority)
+                .setDate(addUpdateTaskViewModel.dateLiveData.value)
+                .setPriority(addUpdateTaskViewModel.priorityLiveData.value)
                 .build()
         )
-
         hideKeyboard()
         findNavController().navigateUp()
     }
 
     private fun submitTodoItem() {
-        val title = binding.etTitle.text.toString().trim()
-        val category = binding.autoCompleteCategory.text.toString().trim()
-        val note = binding.etNote.text.toString().trim()
-        val date = binding.etDate.text.toString().trim()
-        val priority = binding.autoCompletePriority.text.toString().trim()
-
-
         val randomInt = (100..100000).random()
         addUpdateTaskViewModel.addTodo(
             Todo.newBuilder()
                 .setId(randomInt)
-                .setTitle(title)
-                .setCategory(category)
-                .setTodo(note)
+                .setTitle(addUpdateTaskViewModel.titleLiveData.value)
+                .setCategory(addUpdateTaskViewModel.categoryLiveData.value)
+                .setTodo(addUpdateTaskViewModel.noteLiveData.value)
                 .setCompleted(false)
                 .setUserId(1)
-                .setDate(date)
-                .setPriority(priority)
+                .setDate(addUpdateTaskViewModel.dateLiveData.value)
+                .setPriority(addUpdateTaskViewModel.priorityLiveData.value)
                 .build()
         )
         hideKeyboard()

@@ -44,6 +44,7 @@ class HomeFragment : Fragment(), BottomSheetFilterListDialogFragment.OnItemClick
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
+        binding.lifecycleOwner = viewLifecycleOwner
         return binding.root
     }
 

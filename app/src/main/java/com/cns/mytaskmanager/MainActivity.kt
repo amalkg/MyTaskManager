@@ -10,6 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.cns.mytaskmanager.databinding.ActivityMainBinding
 import com.cns.mytaskmanager.utils.ContextUtils
 import com.google.android.material.snackbar.Snackbar
@@ -27,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
+        installSplashScreen()
         setContentView(binding.root)
         requestPermissionLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) {

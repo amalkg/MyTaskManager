@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.view.View
+import android.widget.Toast
 import androidx.annotation.IdRes
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -88,4 +89,8 @@ fun String.convertDateToMilliseconds(inputFormat: String): Long {
     val format = SimpleDateFormat(inputFormat, Locale.getDefault())
     val date = format.parse(this)
     return date?.time ?: 0
+}
+
+fun Context.showToast(message: String) {
+    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
 }

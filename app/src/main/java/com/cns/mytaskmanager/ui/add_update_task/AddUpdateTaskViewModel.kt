@@ -1,5 +1,6 @@
 package com.cns.mytaskmanager.ui.add_update_task
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cns.mytaskmanager.Todo
@@ -15,6 +16,32 @@ class AddUpdateTaskViewModel @Inject constructor(
     private val dataRepository: DataStoreRepository
 ) :
     ViewModel() {
+
+    val titleLiveData = MutableLiveData<String>()
+    val categoryLiveData = MutableLiveData<String>()
+    val noteLiveData = MutableLiveData<String>()
+    val dateLiveData = MutableLiveData<String>()
+    val priorityLiveData = MutableLiveData<String>()
+    val isValidLiveData = MutableLiveData<Boolean>()
+
+    fun validateForm() {
+        val title = titleLiveData.value.orEmpty()
+        val category = categoryLiveData.value.orEmpty()
+        val note = noteLiveData.value.orEmpty()
+        val date = dateLiveData.value.orEmpty()
+        val priority = priorityLiveData.value.orEmpty()
+
+        val isTitleValid = title.isNotEmpty()
+        val isCategoryValid = category.isNotEmpty()
+        val isNoteValid = note.isNotEmpty()
+        val isDateValid = date.isNotEmpty()
+        val isPriorityValid = priority.isNotEmpty()
+
+        isValidLiveData.value =
+            isTitleValid && isCategoryValid && isNoteValid && isDateValid && isPriorityValid
+    }
+
+
     fun addTodo(todos: Todo) = viewModelScope.launch {
         dataRepository.addTodo(todos)
     }
