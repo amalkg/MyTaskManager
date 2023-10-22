@@ -39,11 +39,11 @@ class BottomSheetSortListDialogFragment(private val listener: OnItemClickListene
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.recyclerView.layoutManager = LinearLayoutManager(context)
+        binding.recyclerViewSort.layoutManager = LinearLayoutManager(context)
         val adapter = ItemAdapter(items) { item ->
             listener.onSortItemClick(item)
             dismiss()
         }
-        binding.recyclerView.adapter = adapter
+        binding.recyclerViewSort.adapter = adapter
     }
 }

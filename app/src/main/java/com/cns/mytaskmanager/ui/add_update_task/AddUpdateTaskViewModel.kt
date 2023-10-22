@@ -24,6 +24,9 @@ class AddUpdateTaskViewModel @Inject constructor(
     val priorityLiveData = MutableLiveData<String>()
     val isValidLiveData = MutableLiveData<Boolean>()
 
+    /**
+     * Validation for add and update function
+     */
     fun validateForm() {
         val title = titleLiveData.value.orEmpty()
         val category = categoryLiveData.value.orEmpty()
@@ -41,15 +44,23 @@ class AddUpdateTaskViewModel @Inject constructor(
             isTitleValid && isCategoryValid && isNoteValid && isDateValid && isPriorityValid
     }
 
-
+    /**
+     * Add single task to the datastore
+     */
     fun addTodo(todos: Todo) = viewModelScope.launch {
         dataRepository.addTodo(todos)
     }
 
+    /**
+     * Remove single task from the datastore
+     */
     fun removeTodo(position: Int) = viewModelScope.launch {
         dataRepository.removeTodo(position)
     }
 
+    /**
+     * Update single task in the datastore
+     */
     fun updateTodo(position: Int, todo: Todo) = viewModelScope.launch {
         dataRepository.updateTodo(position, todo)
     }

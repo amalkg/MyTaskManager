@@ -33,11 +33,11 @@ class BottomSheetFilterListDialogFragment(private val listener: OnItemClickListe
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.recyclerView.layoutManager = LinearLayoutManager(context)
+        binding.recyclerViewFilter.layoutManager = LinearLayoutManager(context)
         val adapter = ItemAdapter(items) { item ->
             listener.onFilterItemClick(item)
             dismiss()
         }
-        binding.recyclerView.adapter = adapter
+        binding.recyclerViewFilter.adapter = adapter
     }
 }

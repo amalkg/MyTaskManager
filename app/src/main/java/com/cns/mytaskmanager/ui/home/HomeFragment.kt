@@ -189,20 +189,38 @@ class HomeFragment : Fragment(), BottomSheetFilterListDialogFragment.OnItemClick
         )
     }
 
+    /**
+     * Filter all tasks by Category
+     */
     private fun getListByCategory(category: String): List<Todo> =
         todosOriginal.filter { it.category == category }
 
+    /**
+     * Filter all tasks by Status
+     */
     private fun getListByStatus(status: Boolean): List<Todo> =
         todosOriginal.filter { it.completed == status }
 
+    /**
+     * Sort all tasks by Priority(High to Low)
+     */
     private fun getSortedListByPriorityHighLow(): List<Todo> =
         todosOriginal.sortedWith(PriorityComparatorHighLow())
 
+    /**
+     * Sort all tasks by Priority(Low to High)
+     */
     private fun getSortedListByPriorityLowHigh(): List<Todo> =
         todosOriginal.sortedWith(PriorityComparatorLowHigh())
 
+    /**
+     * Sort all tasks by Date
+     */
     private fun getSortedListByDate(): List<Todo> = todosOriginal.sortedWith(compareBy { it.date })
 
+    /**
+     * Update the recyclerview list
+     */
     private fun replaceItems(items: List<Todo>) {
         if (items.isNotEmpty()) {
             binding.layoutNoData.hide()

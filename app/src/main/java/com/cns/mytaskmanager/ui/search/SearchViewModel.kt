@@ -29,10 +29,16 @@ class SearchViewModel @Inject constructor(
 
     val searchList = MutableLiveData<List<Todo>>()
 
+    /**
+     * Get all tasks saved in the datastore
+     */
     fun getTodoList() = viewModelScope.launch {
         _todoList = dataRepository.getTodoList()
     }
 
+    /**
+     * Filter all tasks saved in the datastore
+     */
     fun filterList(query: String) {
         searchList.value = _todoList.value?.filter {
             it.title.contains(query, ignoreCase = true) //
