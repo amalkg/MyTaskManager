@@ -1,7 +1,6 @@
 package com.cns.mytaskmanager.ui.home
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +11,6 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
-import com.cns.mytaskmanager.MainActivity
 import com.cns.mytaskmanager.R
 import com.cns.mytaskmanager.Todo
 import com.cns.mytaskmanager.data.BaseResult
@@ -23,9 +21,11 @@ import com.cns.mytaskmanager.utils.PriorityComparatorLowHigh
 import com.cns.mytaskmanager.utils.bottom_sheet.BottomSheetFilterListDialogFragment
 import com.cns.mytaskmanager.utils.bottom_sheet.BottomSheetSortListDialogFragment
 import com.cns.mytaskmanager.utils.hide
+import com.cns.mytaskmanager.utils.isNetworkAvailable
 import com.cns.mytaskmanager.utils.safeNavigate
 import com.cns.mytaskmanager.utils.setCustomClickListener
 import com.cns.mytaskmanager.utils.show
+import com.cns.mytaskmanager.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -112,7 +112,13 @@ class HomeFragment : Fragment(), BottomSheetFilterListDialogFragment.OnItemClick
             todosOriginal = arrayListOf()
             todosOriginal.addAll(list)
             if (list.isNullOrEmpty()) {
-                homeViewModel.fetchTaskList()
+                if (isNetworkAvailable(requireContext())) {
+                    homeViewModel.fetchTaskList()
+                } else {
+                    requireContext().showToast(getString(R.string.please_check_your_internet_connection))
+                    binding.layoutNoData.show()
+                    binding.progressIndicator.hide()
+                }
             } else {
                 binding.layoutNoData.hide()
                 binding.recyclerviewTaskList.show()
@@ -128,10 +134,12 @@ class HomeFragment : Fragment(), BottomSheetFilterListDialogFragment.OnItemClick
                     binding.progressIndicator.hide()
                     binding.recyclerviewTaskList.show()
                 }
+
                 is BaseResult.Error -> {
                     println(it.exception)
                     binding.layoutNoData.show()
                 }
+
                 BaseResult.Loading -> {
                     binding.progressIndicator.show()
                     binding.recyclerviewTaskList.hide()

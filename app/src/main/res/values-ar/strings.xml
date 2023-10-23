@@ -28,4 +28,6 @@
     <string name="priority_high_to_low">الأولوية - من الأعلى إلى الأقل</string>
     <string name="priority_low_to_high">الأولوية - من الأقل إلى الأعلى</string>
     <string name="completed1">Completed</string>
+    <string name="please_check_your_internet_connection">الرجاء التحقق من اتصال الانترنت الخاص بك</string>
+    <string name="please_update_all_fields">يرجى تحديث كافة الحقول</string>
 </resources>

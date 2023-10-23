@@ -84,7 +84,7 @@ class AddUpdateTaskFragment : Fragment() {
                     AlarmManager.INTERVAL_DAY, pendingIntent
                 )
             } else {
-                context?.showToast("Please update all fields")
+                requireContext().showToast(getString(R.string.please_update_all_fields))
             }
         }
     }

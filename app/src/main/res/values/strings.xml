@@ -27,6 +27,8 @@
     <string name="priority_high_to_low">Priority - High to low</string>
     <string name="priority_low_to_high">Priority - Low to high</string>
     <string name="completed1">Completed</string>
+    <string name="please_check_your_internet_connection">Please check your internet connection</string>
+    <string name="please_update_all_fields">Please update all fields</string>
 
     <string-array name="categories">
         <item>General</item>
