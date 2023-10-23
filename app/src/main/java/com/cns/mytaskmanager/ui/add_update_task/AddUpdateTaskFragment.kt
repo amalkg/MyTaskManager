@@ -1,16 +1,11 @@
 package com.cns.mytaskmanager.ui.add_update_task
 
-import android.app.AlarmManager
 import android.app.DatePickerDialog
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
+import androidx.appcompat.widget.PopupMenu
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.work.Data
@@ -36,6 +31,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+
 
 @AndroidEntryPoint
 class AddUpdateTaskFragment : BaseFragment<FragmentAddUpdateTaskBinding, AddUpdateTaskViewModel>() {
@@ -100,16 +96,6 @@ class AddUpdateTaskFragment : BaseFragment<FragmentAddUpdateTaskBinding, AddUpda
             binding.btnCancel.text = getString(R.string.cancel)
             binding.checkboxStatus.hide()
         }
-
-        val categories = resources.getStringArray(R.array.categories)
-        val arrayAdapterCategory =
-            context?.let { ArrayAdapter(it, R.layout.drop_down_item, categories) }
-        binding.autoCompleteCategory.setAdapter(arrayAdapterCategory)
-
-        val priorities = resources.getStringArray(R.array.priorities)
-        val arrayAdapterPriority =
-            context?.let { ArrayAdapter(it, R.layout.drop_down_item, priorities) }
-        binding.autoCompletePriority.setAdapter(arrayAdapterPriority)
     }
 
     private fun setupClickListeners() {
@@ -117,11 +103,13 @@ class AddUpdateTaskFragment : BaseFragment<FragmentAddUpdateTaskBinding, AddUpda
             hideKeyboard()
             findNavController().navigateUp()
         }
-        binding.autoCompleteCategory.setCustomClickListener {
+        binding.etCategory.setCustomClickListener {
             hideKeyboard()
+            showCategoryMenu()
         }
-        binding.autoCompletePriority.setCustomClickListener {
+        binding.etPriority.setCustomClickListener {
             hideKeyboard()
+            showPriorityMenu()
         }
         binding.etDate.setCustomClickListener {
             hideKeyboard()
@@ -150,6 +138,40 @@ class AddUpdateTaskFragment : BaseFragment<FragmentAddUpdateTaskBinding, AddUpda
         binding.btnSubmit.setCustomClickListener {
             viewModel.validateForm()
         }
+    }
+
+    private fun showPriorityMenu() {
+        val popup = PopupMenu(requireContext(), binding.etPriority)
+
+        val dynamicMenuItems = resources.getStringArray(R.array.priorities)
+
+        for (item in dynamicMenuItems) {
+            popup.menu.add(item)
+        }
+
+        popup.setOnMenuItemClickListener { item ->
+            binding.etPriority.setText(item.title)
+            false
+        }
+
+        popup.show()
+    }
+
+    private fun showCategoryMenu() {
+        val popup = PopupMenu(requireContext(), binding.etCategory)
+
+        val dynamicMenuItems = resources.getStringArray(R.array.categories)
+
+        for (item in dynamicMenuItems) {
+            popup.menu.add(item)
+        }
+
+        popup.setOnMenuItemClickListener { item ->
+            binding.etCategory.setText(item.title)
+            false
+        }
+
+        popup.show()
     }
 
     private fun updateTodoItem() {
@@ -231,7 +253,8 @@ class AddUpdateTaskFragment : BaseFragment<FragmentAddUpdateTaskBinding, AddUpda
         val currentMilliseconds = current.convertDateToMilliseconds()
         val futureMilliseconds = dateString.convertDateToMilliseconds()
 
-        val minuteDuration = TimeUnit.MILLISECONDS.toMinutes(futureMilliseconds - currentMilliseconds)
+        val minuteDuration =
+            TimeUnit.MILLISECONDS.toMinutes(futureMilliseconds - currentMilliseconds)
 
         val workRequest = if (futureMilliseconds > currentMilliseconds) {
             OneTimeWorkRequest.Builder(NotificationWorker::class.java)
