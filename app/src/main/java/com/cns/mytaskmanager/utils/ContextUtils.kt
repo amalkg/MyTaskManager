@@ -9,13 +9,13 @@ class ContextUtils(base: Context) : ContextWrapper(base) {
     companion object {
         fun updateLocale(context: Context, localeToSwitchTo: Locale): ContextUtils {
             val resources = context.resources
-            val configuration = resources.configuration // 1
+            val configuration = resources.configuration
 
-            val localeList = LocaleList(localeToSwitchTo) // 2
-            LocaleList.setDefault(localeList) // 3
-            configuration.setLocales(localeList) // 4
+            val localeList = LocaleList(localeToSwitchTo)
+            LocaleList.setDefault(localeList)
+            configuration.setLocales(localeList)
 
-            val updatedContext = context.createConfigurationContext(configuration) // 5
+            val updatedContext = context.createConfigurationContext(configuration)
 
             return ContextUtils(updatedContext)
         }

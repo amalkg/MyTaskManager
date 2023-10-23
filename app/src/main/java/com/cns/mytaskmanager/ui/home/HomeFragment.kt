@@ -6,13 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.cns.mytaskmanager.R
 import com.cns.mytaskmanager.Todo
+import com.cns.mytaskmanager.core.BaseFragment
 import com.cns.mytaskmanager.data.BaseResult
 import com.cns.mytaskmanager.data.model.Todos
 import com.cns.mytaskmanager.databinding.FragmentHomeBinding
@@ -29,24 +28,13 @@ import com.cns.mytaskmanager.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class HomeFragment : Fragment(), BottomSheetFilterListDialogFragment.OnItemClickListener,
+class HomeFragment : BaseFragment<FragmentHomeBinding, HomeViewModel>(),
+    BottomSheetFilterListDialogFragment.OnItemClickListener,
     BottomSheetSortListDialogFragment.OnItemClickListener {
-    private val homeViewModel: HomeViewModel by viewModels()
-    private lateinit var binding: FragmentHomeBinding
 
     private var taskAdapter: TaskAdapter? = null
 
     private var todosOriginal: ArrayList<Todo> = ArrayList()
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = FragmentHomeBinding.inflate(inflater, container, false)
-        binding.lifecycleOwner = viewLifecycleOwner
-        return binding.root
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -54,6 +42,22 @@ class HomeFragment : Fragment(), BottomSheetFilterListDialogFragment.OnItemClick
         setupRecyclerView()
         setupObservables()
         setupClickListeners()
+    }
+
+    override fun getViewBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): FragmentHomeBinding {
+        return FragmentHomeBinding.inflate(inflater, container, false)
+    }
+
+    override fun getViewModelClass(): Class<HomeViewModel> {
+        return HomeViewModel::class.java
+    }
+
+    override fun setupViews() {
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = viewModel
     }
 
     private fun setupClickListeners() {
@@ -108,12 +112,12 @@ class HomeFragment : Fragment(), BottomSheetFilterListDialogFragment.OnItemClick
 
     @SuppressLint("NotifyDataSetChanged")
     private fun setupObservables() {
-        homeViewModel.todoList.observe(viewLifecycleOwner) { list ->
+        viewModel.todoList.observe(viewLifecycleOwner) { list ->
             todosOriginal = arrayListOf()
             todosOriginal.addAll(list)
             if (list.isNullOrEmpty()) {
                 if (isNetworkAvailable(requireContext())) {
-                    homeViewModel.fetchTaskList()
+                    viewModel.fetchTaskList()
                 } else {
                     requireContext().showToast(getString(R.string.please_check_your_internet_connection))
                     binding.layoutNoData.show()
@@ -128,7 +132,7 @@ class HomeFragment : Fragment(), BottomSheetFilterListDialogFragment.OnItemClick
             }
         }
 
-        homeViewModel.todoListFromApi.observe(viewLifecycleOwner) {
+        viewModel.todoListFromApi.observe(viewLifecycleOwner) {
             when (it) {
                 is BaseResult.Success -> {
                     binding.progressIndicator.hide()
@@ -140,7 +144,7 @@ class HomeFragment : Fragment(), BottomSheetFilterListDialogFragment.OnItemClick
                     binding.layoutNoData.show()
                 }
 
-                BaseResult.Loading -> {
+                is BaseResult.Loading -> {
                     binding.progressIndicator.show()
                     binding.recyclerviewTaskList.hide()
                     binding.layoutNoData.hide()
@@ -172,7 +176,7 @@ class HomeFragment : Fragment(), BottomSheetFilterListDialogFragment.OnItemClick
 
     fun removeAt(index: Int) {
         todosOriginal.removeAt(index)
-        homeViewModel.removeTodo(index)
+        viewModel.removeTodo(index)
         taskAdapter?.notifyItemRemoved(index)
     }
 

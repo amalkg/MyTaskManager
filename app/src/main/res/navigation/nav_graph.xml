@@ -23,7 +23,11 @@
         android:id="@+id/searchFragment"
         android:name="com.cns.mytaskmanager.ui.search.SearchFragment"
         android:label="SearchFragment"
-        tools:layout="@layout/fragment_search" />
+        tools:layout="@layout/fragment_search">
+        <action
+            android:id="@+id/action_searchFragment_to_addUpdateTaskFragment"
+            app:destination="@id/addUpdateTaskFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/homeFragment"

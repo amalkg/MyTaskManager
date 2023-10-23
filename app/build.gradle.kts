@@ -73,6 +73,9 @@ dependencies {
     implementation(dependencyNotation = "androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
     implementation(dependencyNotation = "androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
     implementation(dependencyNotation = "androidx.databinding:databinding-runtime:8.1.2")
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("com.google.android.material:material:1.10.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     androidTestImplementation(dependencyNotation = "androidx.test.ext:junit:1.1.5")
     androidTestImplementation(dependencyNotation = "androidx.test.espresso:espresso-core:3.5.1")
 
@@ -108,9 +111,6 @@ dependencies {
     testImplementation(dependencyNotation = "junit:junit:4.13.2")
     testImplementation(dependencyNotation = "com.squareup.okhttp3:mockwebserver:4.9.2")
     testImplementation(dependencyNotation = "org.mockito:mockito-core:3.9.0")
-
-    //Splash Screen
-    implementation(dependencyNotation = "androidx.core:core-splashscreen:1.0.1")
 
 
 }

@@ -30,4 +30,6 @@
     <string name="completed1">Completed</string>
     <string name="please_check_your_internet_connection">الرجاء التحقق من اتصال الانترنت الخاص بك</string>
     <string name="please_update_all_fields">يرجى تحديث كافة الحقول</string>
+    <string name="task_updated_successfully">تم تحديث المهمة بنجاح</string>
+    <string name="task_added_successfully">تمت إضافة المهمة بنجاح</string>
 </resources>

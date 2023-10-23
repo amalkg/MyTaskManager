@@ -13,12 +13,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.cns.mytaskmanager.R
 import com.cns.mytaskmanager.Todo
+import com.cns.mytaskmanager.core.BaseFragment
 import com.cns.mytaskmanager.databinding.FragmentAddUpdateTaskBinding
 import com.cns.mytaskmanager.utils.convertDateToMilliseconds
 import com.cns.mytaskmanager.utils.hide
@@ -33,26 +32,13 @@ import java.util.Calendar
 import java.util.Locale
 
 @AndroidEntryPoint
-class AddUpdateTaskFragment : Fragment() {
-    private val addUpdateTaskViewModel: AddUpdateTaskViewModel by viewModels()
-    private lateinit var binding: FragmentAddUpdateTaskBinding
+class AddUpdateTaskFragment : BaseFragment<FragmentAddUpdateTaskBinding, AddUpdateTaskViewModel>() {
     private val args by navArgs<AddUpdateTaskFragmentArgs>()
 
     private val calendar = Calendar.getInstance()
 
     private lateinit var alarmManager: AlarmManager
     private lateinit var pendingIntent: PendingIntent
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = FragmentAddUpdateTaskBinding.inflate(inflater, container, false)
-        binding.lifecycleOwner = viewLifecycleOwner
-        binding.viewModel = addUpdateTaskViewModel
-        return binding.root
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -63,8 +49,24 @@ class AddUpdateTaskFragment : Fragment() {
         setupClickListeners()
     }
 
+    override fun getViewBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): FragmentAddUpdateTaskBinding {
+        return FragmentAddUpdateTaskBinding.inflate(inflater, container, false)
+    }
+
+    override fun getViewModelClass(): Class<AddUpdateTaskViewModel> {
+        return AddUpdateTaskViewModel::class.java
+    }
+
+    override fun setupViews() {
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = viewModel
+    }
+
     private fun setupObservables() {
-        addUpdateTaskViewModel.isValidLiveData.observe(viewLifecycleOwner) { isValid ->
+        viewModel.isValidLiveData.observe(viewLifecycleOwner) { isValid ->
             if (isValid) {
                 if (args.todoItem != null) {
                     updateTodoItem()
@@ -95,11 +97,11 @@ class AddUpdateTaskFragment : Fragment() {
             binding.btnSubmit.text = getString(R.string.update)
             binding.btnCancel.text = getString(R.string.delete)
             binding.checkboxStatus.show()
-            addUpdateTaskViewModel.titleLiveData.value = args.todoItem!!.title
-            addUpdateTaskViewModel.noteLiveData.value = args.todoItem!!.todo
-            addUpdateTaskViewModel.dateLiveData.value = args.todoItem!!.date
-            addUpdateTaskViewModel.categoryLiveData.value = args.todoItem!!.category
-            addUpdateTaskViewModel.priorityLiveData.value = args.todoItem!!.priority
+            viewModel.titleLiveData.value = args.todoItem!!.title
+            viewModel.noteLiveData.value = args.todoItem!!.todo
+            viewModel.dateLiveData.value = args.todoItem!!.date
+            viewModel.categoryLiveData.value = args.todoItem!!.category
+            viewModel.priorityLiveData.value = args.todoItem!!.priority
             binding.checkboxStatus.isChecked = args.todoItem!!.completed
         } else {
             binding.toolbarTitle.text = getString(R.string.add_task)
@@ -150,13 +152,13 @@ class AddUpdateTaskFragment : Fragment() {
         }
         binding.btnCancel.setCustomClickListener {
             if (args.todoItem != null) {
-                addUpdateTaskViewModel.removeTodo(args.position)
+                viewModel.removeTodo(args.position)
             }
             hideKeyboard()
             findNavController().navigateUp()
         }
         binding.btnSubmit.setCustomClickListener {
-            addUpdateTaskViewModel.validateForm()
+            viewModel.validateForm()
         }
     }
 
@@ -164,39 +166,41 @@ class AddUpdateTaskFragment : Fragment() {
         val id = args.todoItem?.id
         val completed = binding.checkboxStatus.isChecked
 
-        addUpdateTaskViewModel.updateTodo(
+        viewModel.updateTodo(
             args.position,
             Todo.newBuilder()
                 .setId(id!!)
-                .setTitle(addUpdateTaskViewModel.titleLiveData.value)
-                .setCategory(addUpdateTaskViewModel.categoryLiveData.value)
-                .setTodo(addUpdateTaskViewModel.noteLiveData.value)
+                .setTitle(viewModel.titleLiveData.value)
+                .setCategory(viewModel.categoryLiveData.value)
+                .setTodo(viewModel.noteLiveData.value)
                 .setCompleted(completed)
                 .setUserId(1)
-                .setDate(addUpdateTaskViewModel.dateLiveData.value)
-                .setPriority(addUpdateTaskViewModel.priorityLiveData.value)
+                .setDate(viewModel.dateLiveData.value)
+                .setPriority(viewModel.priorityLiveData.value)
                 .build()
         )
         hideKeyboard()
         findNavController().navigateUp()
+        requireContext().showToast(getString(R.string.task_updated_successfully))
     }
 
     private fun submitTodoItem() {
         val randomInt = (100..100000).random()
-        addUpdateTaskViewModel.addTodo(
+        viewModel.addTodo(
             Todo.newBuilder()
                 .setId(randomInt)
-                .setTitle(addUpdateTaskViewModel.titleLiveData.value)
-                .setCategory(addUpdateTaskViewModel.categoryLiveData.value)
-                .setTodo(addUpdateTaskViewModel.noteLiveData.value)
+                .setTitle(viewModel.titleLiveData.value)
+                .setCategory(viewModel.categoryLiveData.value)
+                .setTodo(viewModel.noteLiveData.value)
                 .setCompleted(false)
                 .setUserId(1)
-                .setDate(addUpdateTaskViewModel.dateLiveData.value)
-                .setPriority(addUpdateTaskViewModel.priorityLiveData.value)
+                .setDate(viewModel.dateLiveData.value)
+                .setPriority(viewModel.priorityLiveData.value)
                 .build()
         )
         hideKeyboard()
         findNavController().navigateUp()
+        requireContext().showToast(getString(R.string.task_added_successfully))
     }
 
     private fun showDatePicker() {

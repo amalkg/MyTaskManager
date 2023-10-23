@@ -1,5 +1,6 @@
 package com.cns.mytaskmanager.module
 
+import androidx.lifecycle.ViewModelProvider
 import com.cns.mytaskmanager.data.ApiService
 import dagger.Module
 import dagger.Provides
@@ -11,6 +12,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Named
 import javax.inject.Singleton
+
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -43,5 +45,10 @@ object AppModule {
     @Provides
     fun provideApiClient(retrofit: Retrofit): ApiService {
         return retrofit.create(ApiService::class.java)
+    }
+
+    @Provides
+    fun provideViewModelFactory(factory: ViewModelProvider.Factory): ViewModelProvider.Factory {
+        return factory
     }
 }
