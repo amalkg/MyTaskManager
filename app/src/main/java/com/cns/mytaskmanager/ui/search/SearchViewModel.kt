@@ -7,9 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.cns.mytaskmanager.Todo
 import com.cns.mytaskmanager.data.DataStoreRepository
 import com.cns.mytaskmanager.data.MainRepository
-import com.cns.mytaskmanager.data.model.Todos
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -34,6 +32,13 @@ class SearchViewModel @Inject constructor(
      */
     fun getTodoList() = viewModelScope.launch {
         _todoList = dataRepository.getTodoList()
+    }
+
+    /**
+     * Remove single task from the datastore
+     */
+    fun removeTodo(position: Int) = viewModelScope.launch {
+        dataRepository.removeTodo(position)
     }
 
     /**

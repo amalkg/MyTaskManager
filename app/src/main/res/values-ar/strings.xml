@@ -32,4 +32,7 @@
     <string name="please_update_all_fields">يرجى تحديث كافة الحقول</string>
     <string name="task_updated_successfully">تم تحديث المهمة بنجاح</string>
     <string name="task_added_successfully">تمت إضافة المهمة بنجاح</string>
+    <string name="delete_task">Delete Task</string>
+    <string name="are_you_sure_you_want_to_delete_the_task">Are you sure you want to delete the task?</string>
+    <string name="ok">OK</string>
 </resources>

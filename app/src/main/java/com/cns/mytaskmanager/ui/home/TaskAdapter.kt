@@ -11,7 +11,7 @@ import com.cns.mytaskmanager.Todo
 import com.cns.mytaskmanager.databinding.ItemTaskBinding
 import com.cns.mytaskmanager.utils.setCustomClickListener
 
-class TaskAdapter(val onClickTask: (Todo) -> Unit) :
+class TaskAdapter(val onClickTask: (Todo) -> Unit, val onDeleteTask: (Todo) -> Unit) :
     ListAdapter<Todo, TaskAdapter.ViewHolder>(object :
         DiffUtil.ItemCallback<Todo?>() {
         override fun areItemsTheSame(
@@ -89,6 +89,10 @@ class TaskAdapter(val onClickTask: (Todo) -> Unit) :
 
             binding.parent.setCustomClickListener {
                 onClickTask(item)
+            }
+
+            binding.imageDelete.setCustomClickListener {
+                onDeleteTask(item)
             }
         }
     }

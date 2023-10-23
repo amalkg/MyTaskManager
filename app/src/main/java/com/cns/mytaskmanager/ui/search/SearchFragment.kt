@@ -10,18 +10,17 @@ import android.view.ViewGroup
 import androidx.core.view.doOnNextLayout
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.SimpleItemAnimator
+import com.cns.mytaskmanager.R
 import com.cns.mytaskmanager.Todo
 import com.cns.mytaskmanager.core.BaseFragment
 import com.cns.mytaskmanager.data.model.Todos
-import com.cns.mytaskmanager.databinding.FragmentHomeBinding
 import com.cns.mytaskmanager.databinding.FragmentSearchBinding
-import com.cns.mytaskmanager.ui.home.HomeFragmentDirections
-import com.cns.mytaskmanager.ui.home.HomeViewModel
 import com.cns.mytaskmanager.ui.home.TaskAdapter
 import com.cns.mytaskmanager.utils.hideKeyboard
 import com.cns.mytaskmanager.utils.safeNavigate
 import com.cns.mytaskmanager.utils.setCustomClickListener
 import com.cns.mytaskmanager.utils.showKeyboard
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -91,14 +90,35 @@ class SearchFragment : BaseFragment<FragmentSearchBinding, SearchViewModel>() {
     }
 
     private fun setupRecyclerView() {
-        taskAdapter = TaskAdapter { item ->
+        taskAdapter = TaskAdapter({ item ->
             onClickTask(item)
-        }
+        }, { deleteItem ->
+            onDeleteTask(deleteItem)
+            hideKeyboard()
+        })
         binding.recyclerviewTaskList.apply {
             setHasFixedSize(true)
             (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             adapter = taskAdapter
         }
+    }
+
+    private fun onDeleteTask(deleteItem: Todo) {
+        showDeleteDialog(deleteItem)
+    }
+
+    private fun showDeleteDialog(deleteItem: Todo) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.delete_task))
+            .setMessage(getString(R.string.are_you_sure_you_want_to_delete_the_task))
+            .setCancelable(false)
+            .setPositiveButton(getString(R.string.ok)) { dialog, _ ->
+                viewModel.removeTodo(todosOriginal.indexOf(deleteItem))
+            }
+            .setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
     }
 
     private fun onClickTask(item: Todo) {
