@@ -10,10 +10,11 @@ import com.cns.mytaskmanager.R
 import com.cns.mytaskmanager.databinding.BottomSheetListDialogFilterBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-class BottomSheetFilterListDialogFragment(private val listener: OnItemClickListener) :
+class BottomSheetFilterListDialogFragment(
+    private val listener: OnItemClickListener,
+    private val filterList: ArrayList<String>
+) :
     BottomSheetDialogFragment() {
-
-    private val items = listOf("All", "General", "Personal", "Family", "Fun", "Games", "Tour")
 
     private lateinit var binding: BottomSheetListDialogFilterBinding
 
@@ -34,7 +35,8 @@ class BottomSheetFilterListDialogFragment(private val listener: OnItemClickListe
         super.onViewCreated(view, savedInstanceState)
 
         binding.recyclerViewFilter.layoutManager = LinearLayoutManager(context)
-        val adapter = ItemAdapter(items) { item ->
+        filterList.add(0, getString(R.string.all))
+        val adapter = ItemAdapter(filterList.distinct()) { item ->
             listener.onFilterItemClick(item)
             dismiss()
         }

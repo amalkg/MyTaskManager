@@ -6,6 +6,13 @@
     app:startDestination="@id/homeFragment">
 
     <fragment
+        android:id="@+id/addCategoryFragment"
+        android:name="com.cns.mytaskmanager.ui.add_category.AddCategoryFragment"
+        android:label="AddCategoryFragment"
+        tools:layout="@layout/fragment_add_category"/>
+
+
+    <fragment
         android:id="@+id/addUpdateTaskFragment"
         android:name="com.cns.mytaskmanager.ui.add_update_task.AddUpdateTaskFragment"
         android:label="AddUpdateTaskFragment"
@@ -41,5 +48,9 @@
         <action
             android:id="@+id/action_homeFragment_to_searchFragment"
             app:destination="@id/searchFragment" />
+
+        <action
+            android:id="@+id/action_homeFragment_to_addCategoryFragment"
+            app:destination="@id/addCategoryFragment" />
     </fragment>
 </navigation>

@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="viewModel"
             type="com.cns.mytaskmanager.ui.home.HomeViewModel" />
@@ -53,17 +54,6 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/image_add"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:padding="8dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/image_three_dot"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:srcCompat="@drawable/ic_add" />
-
-                    <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/image_three_dot"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -101,12 +91,13 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:clickable="true"
+                            android:cursorVisible="false"
                             android:focusable="false"
                             android:hint="@string/search"
-                            android:imeOptions="actionNext"
                             android:inputType="text|textCapSentences"
                             android:maxLength="150"
-                            android:textColor="@color/color_black" />
+                            android:textColor="@color/color_black"
+                            app:fontFamily="@font/roboto_regular" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -127,7 +118,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:clipToPadding="false"
-                android:paddingBottom="60dp"
+                android:paddingBottom="80dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -173,7 +164,7 @@
                     android:layout_marginTop="20dp"
                     android:layout_marginEnd="32dp"
                     android:gravity="center"
-                    android:text="No task found"
+                    android:text="@string/no_task_found"
                     android:textColor="@color/colorPrimary"
                     android:textSize="18sp"
                     app:fontFamily="@font/roboto_bold"
@@ -249,19 +240,20 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
-        <!--        android:id="@+id/idFABAdd"-->
-        <!--        android:layout_width="wrap_content"-->
-        <!--        android:layout_height="wrap_content"-->
-        <!--        android:layout_gravity="end|bottom"-->
-        <!--        android:layout_marginEnd="16dp"-->
-        <!--        android:layout_marginBottom="24dp"-->
-        <!--        android:background="@color/colorPrimary"-->
-        <!--        android:contentDescription="@string/app_name"-->
-        <!--        android:padding="4dp"-->
-        <!--        android:src="@drawable/ic_add"-->
-        <!--        app:backgroundTint="@color/colorPrimary"-->
-        <!--        app:tint="@color/color_white" />-->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|bottom"
+            android:layout_marginBottom="20dp"
+            android:background="@color/colorPrimary"
+            android:contentDescription="@string/app_name"
+            android:elevation="10dp"
+            android:padding="4dp"
+            android:src="@drawable/ic_add"
+            app:backgroundTint="@color/colorPrimary"
+            app:elevation="10dp"
+            app:tint="@color/color_white" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

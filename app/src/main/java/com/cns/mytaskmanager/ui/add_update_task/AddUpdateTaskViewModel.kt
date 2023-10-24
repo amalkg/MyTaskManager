@@ -1,11 +1,13 @@
 package com.cns.mytaskmanager.ui.add_update_task
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cns.mytaskmanager.Todo
 import com.cns.mytaskmanager.data.DataStoreRepository
 import com.cns.mytaskmanager.data.MainRepository
+import com.cns.mytaskmanager.data.PreferenceDataRepositoryImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -13,9 +15,17 @@ import javax.inject.Inject
 @HiltViewModel
 class AddUpdateTaskViewModel @Inject constructor(
     private val mainRepository: MainRepository,
-    private val dataRepository: DataStoreRepository
+    private val dataRepository: DataStoreRepository,
+    private val preferenceDataRepository: PreferenceDataRepositoryImpl
 ) :
     ViewModel() {
+    init {
+        getCategoryList()
+    }
+
+    private lateinit var _categoryList: LiveData<String?>
+
+    val categoryList: LiveData<String?> = _categoryList
 
     val titleLiveData = MutableLiveData<String>()
     val categoryLiveData = MutableLiveData<String>()
@@ -65,4 +75,10 @@ class AddUpdateTaskViewModel @Inject constructor(
         dataRepository.updateTodo(position, todo)
     }
 
+    /**
+     * Get all categories saved in the datastore
+     */
+    fun getCategoryList() = viewModelScope.launch {
+        _categoryList = preferenceDataRepository.getCategoryList()
+    }
 }

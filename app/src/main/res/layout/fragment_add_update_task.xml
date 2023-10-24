@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="viewModel"
             type="com.cns.mytaskmanager.ui.add_update_task.AddUpdateTaskViewModel" />
@@ -98,9 +99,10 @@
                             android:layout_height="match_parent"
                             android:hint="@string/title"
                             android:imeOptions="actionNext"
-                            android:text="@={viewModel.titleLiveData}"
                             android:inputType="text|textCapSentences"
-                            android:textColor="@color/color_black" />
+                            android:text="@={viewModel.titleLiveData}"
+                            android:textColor="@color/color_black"
+                            app:fontFamily="@font/roboto_regular" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -127,7 +129,8 @@
                             android:inputType="text|textCapSentences|textMultiLine"
                             android:maxLength="150"
                             android:text="@={viewModel.noteLiveData}"
-                            android:textColor="@color/color_black" />
+                            android:textColor="@color/color_black"
+                            app:fontFamily="@font/roboto_regular" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -149,11 +152,12 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:clickable="true"
-                            android:focusable="false"
                             android:cursorVisible="false"
-                            android:text="@={viewModel.categoryLiveData}"
+                            android:focusable="false"
                             android:hint="@string/category"
-                            android:textColor="@color/color_black" />
+                            android:text="@={viewModel.categoryLiveData}"
+                            android:textColor="@color/color_black"
+                            app:fontFamily="@font/roboto_regular" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -177,9 +181,10 @@
                             android:clickable="true"
                             android:cursorVisible="false"
                             android:focusable="false"
-                            android:text="@={viewModel.priorityLiveData}"
                             android:hint="@string/priority"
-                            android:textColor="@color/color_black" />
+                            android:text="@={viewModel.priorityLiveData}"
+                            android:textColor="@color/color_black"
+                            app:fontFamily="@font/roboto_regular" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -203,9 +208,10 @@
                             android:clickable="true"
                             android:cursorVisible="false"
                             android:focusable="false"
-                            android:text="@={viewModel.dateLiveData}"
                             android:hint="@string/select_date"
-                            android:textColor="@color/color_black" />
+                            android:text="@={viewModel.dateLiveData}"
+                            android:textColor="@color/color_black"
+                            app:fontFamily="@font/roboto_regular" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -217,6 +223,7 @@
                         android:layout_marginTop="16dp"
                         android:layout_marginEnd="16dp"
                         android:text="@string/completed"
+                        app:fontFamily="@font/roboto_regular"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/textInputLayoutDate" />
@@ -249,9 +256,9 @@
                         android:layout_marginTop="20dp"
                         android:layout_marginEnd="5dp"
                         android:layout_marginBottom="20dp"
-                        android:fontFamily="@font/roboto_bold"
                         android:text="@string/update"
                         android:textSize="16sp"
+                        app:fontFamily="@font/roboto_bold"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@+id/btn_cancel"
                         app:layout_constraintHorizontal_bias="0.5"
@@ -267,9 +274,9 @@
                         android:layout_marginTop="20dp"
                         android:layout_marginEnd="20dp"
                         android:layout_marginBottom="20dp"
-                        android:fontFamily="@font/roboto_bold"
                         android:text="@string/cancel"
                         android:textSize="16sp"
+                        app:fontFamily="@font/roboto_bold"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.5"

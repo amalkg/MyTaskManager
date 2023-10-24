@@ -1,4 +1,4 @@
-package com.cns.mytaskmanager
+package com.cns.mytaskmanager.ui.main
 
 import android.content.Context
 import android.content.pm.PackageManager
@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import com.cns.mytaskmanager.core.BaseActivity

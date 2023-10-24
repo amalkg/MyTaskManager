@@ -19,6 +19,7 @@ import com.cns.mytaskmanager.databinding.FragmentAddUpdateTaskBinding
 import com.cns.mytaskmanager.utils.convertDateToMilliseconds
 import com.cns.mytaskmanager.utils.hide
 import com.cns.mytaskmanager.utils.hideKeyboard
+import com.cns.mytaskmanager.utils.jsonToList
 import com.cns.mytaskmanager.utils.notification.NotificationWorker
 import com.cns.mytaskmanager.utils.setCustomClickListener
 import com.cns.mytaskmanager.utils.show
@@ -38,6 +39,8 @@ class AddUpdateTaskFragment : BaseFragment<FragmentAddUpdateTaskBinding, AddUpda
     private val args by navArgs<AddUpdateTaskFragmentArgs>()
 
     private val calendar = Calendar.getInstance()
+
+    var categoryListFromDb: ArrayList<String> = ArrayList()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -64,6 +67,12 @@ class AddUpdateTaskFragment : BaseFragment<FragmentAddUpdateTaskBinding, AddUpda
     }
 
     private fun setupObservables() {
+        viewModel.categoryList.observe(viewLifecycleOwner) {
+            println("categoryList in add ==$it")
+            categoryListFromDb = jsonToList(it.toString())
+            println("categoryListFromDb in add ==$categoryListFromDb")
+
+        }
         viewModel.isValidLiveData.observe(viewLifecycleOwner) { isValid ->
             if (isValid) {
                 if (args.todoItem != null) {
@@ -160,9 +169,7 @@ class AddUpdateTaskFragment : BaseFragment<FragmentAddUpdateTaskBinding, AddUpda
     private fun showCategoryMenu() {
         val popup = PopupMenu(requireContext(), binding.etCategory)
 
-        val dynamicMenuItems = resources.getStringArray(R.array.categories)
-
-        for (item in dynamicMenuItems) {
+        for (item in categoryListFromDb.distinct()) {
             popup.menu.add(item)
         }
 

@@ -1,26 +1,30 @@
 package com.cns.mytaskmanager.ui.home
 
 import android.annotation.SuppressLint
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.cns.mytaskmanager.R
 import com.cns.mytaskmanager.Todo
 import com.cns.mytaskmanager.core.BaseFragment
 import com.cns.mytaskmanager.data.BaseResult
 import com.cns.mytaskmanager.data.model.Todos
+import com.cns.mytaskmanager.databinding.DialogAddTaskCategoryBinding
 import com.cns.mytaskmanager.databinding.FragmentHomeBinding
 import com.cns.mytaskmanager.utils.PriorityComparatorHighLow
 import com.cns.mytaskmanager.utils.PriorityComparatorLowHigh
 import com.cns.mytaskmanager.utils.bottom_sheet.BottomSheetFilterListDialogFragment
 import com.cns.mytaskmanager.utils.bottom_sheet.BottomSheetSortListDialogFragment
+import com.cns.mytaskmanager.utils.capitalizeFirstLetter
 import com.cns.mytaskmanager.utils.hide
 import com.cns.mytaskmanager.utils.isNetworkAvailable
+import com.cns.mytaskmanager.utils.jsonToList
+import com.cns.mytaskmanager.utils.listToJson
 import com.cns.mytaskmanager.utils.safeNavigate
 import com.cns.mytaskmanager.utils.setCustomClickListener
 import com.cns.mytaskmanager.utils.show
@@ -36,6 +40,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding, HomeViewModel>(),
     private var taskAdapter: TaskAdapter? = null
 
     private var todosOriginal: ArrayList<Todo> = ArrayList()
+
+    private val categoryList: ArrayList<String> = ArrayList()
+
+    private var categoryListString = ""
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -62,19 +70,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding, HomeViewModel>(),
     }
 
     private fun setupClickListeners() {
-        binding.imageAdd.setCustomClickListener {
-            safeNavigate(
-                HomeFragmentDirections
-                    .actionHomeFragmentToAddUpdateTaskFragment(null, 0)
-            )
-        }
 
         binding.imageThreeDot.setCustomClickListener {
             showPopUpMenu()
         }
 
         binding.layoutFilter.setCustomClickListener {
-            val bottomSheetDialog = BottomSheetFilterListDialogFragment(this)
+            val bottomSheetDialog =
+                BottomSheetFilterListDialogFragment(this, jsonToList(categoryListString))
             bottomSheetDialog.show(childFragmentManager, "BottomSheetDialog")
         }
 
@@ -89,6 +92,37 @@ class HomeFragment : BaseFragment<FragmentHomeBinding, HomeViewModel>(),
                     .actionHomeFragmentToSearchFragment()
             )
         }
+
+        binding.fabAdd.setCustomClickListener {
+            showAddDialog()
+        }
+    }
+
+    private fun showAddDialog() {
+        val dialogBinding = DialogAddTaskCategoryBinding.inflate(layoutInflater)
+        val dialog = MaterialAlertDialogBuilder(requireContext()).apply {
+            setView(dialogBinding.root)
+            setCancelable(true)
+        }.create()
+        dialogBinding.lifecycleOwner = viewLifecycleOwner
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        dialogBinding.textAddTask.setCustomClickListener {
+            safeNavigate(
+                HomeFragmentDirections
+                    .actionHomeFragmentToAddUpdateTaskFragment(null, 0)
+            )
+            dialog.dismiss()
+        }
+
+        dialogBinding.textAddCategory.setCustomClickListener {
+            safeNavigate(
+                HomeFragmentDirections
+                    .actionHomeFragmentToAddCategoryFragment()
+            )
+            dialog.dismiss()
+        }
+        dialog.show()
     }
 
 
@@ -113,9 +147,20 @@ class HomeFragment : BaseFragment<FragmentHomeBinding, HomeViewModel>(),
 
     @SuppressLint("NotifyDataSetChanged")
     private fun setupObservables() {
+        viewModel.categoryList.observe(viewLifecycleOwner) {
+            categoryListString = it.toString()
+        }
         viewModel.todoList.observe(viewLifecycleOwner) { list ->
             todosOriginal = arrayListOf()
             todosOriginal.addAll(list)
+            for (todo in list) {
+                categoryList.add(
+                    capitalizeFirstLetter(todo.category)
+                )
+            }
+            if (categoryListString == "null") {
+                viewModel.saveCategoryList(listToJson(categoryList))
+            }
             if (list.isNullOrEmpty()) {
                 if (isNetworkAvailable(requireContext())) {
                     viewModel.fetchTaskList()

@@ -11,7 +11,6 @@ import com.cns.mytaskmanager.data.MainRepository
 import com.cns.mytaskmanager.data.PreferenceDataRepositoryImpl
 import com.cns.mytaskmanager.data.model.TaskListResponse
 import com.cns.mytaskmanager.utils.capitalizeFirstLetter
-import com.cns.mytaskmanager.utils.listToJson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -27,6 +26,7 @@ class HomeViewModel @Inject constructor(
     ViewModel() {
 
     init {
+        getCategoryList()
         getTodoList()
     }
 
@@ -34,7 +34,9 @@ class HomeViewModel @Inject constructor(
 
     val todoList: LiveData<List<Todo>> = _todoList
 
-    val categoryList: List<String> = emptyList()
+    private lateinit var _categoryList: LiveData<String?>
+
+    val categoryList: LiveData<String?> = _categoryList
 
     private val _todoListFromApi = MutableLiveData<BaseResult<Response<TaskListResponse>>>()
     val todoListFromApi: LiveData<BaseResult<Response<TaskListResponse>>> = _todoListFromApi
@@ -68,6 +70,13 @@ class HomeViewModel @Inject constructor(
     }
 
     /**
+     * Add categories to datastore
+     */
+    fun saveCategoryList(categoryList: String) = viewModelScope.launch {
+        preferenceDataRepository.saveCategoryList(categoryList)
+    }
+
+    /**
      * Get all tasks from the server
      */
     fun fetchTaskList() {
@@ -79,9 +88,6 @@ class HomeViewModel @Inject constructor(
                 clearAllTodoList()
                 for (todo in result.body()?.todos!!) {
                     println("title" + todo.title)
-                    categoryList.toMutableList().add(
-                        capitalizeFirstLetter(todo.category)
-                    )
                     addTodoList(
                         listOf(
                             Todo.newBuilder()
@@ -98,15 +104,16 @@ class HomeViewModel @Inject constructor(
                     )
                 }
 
-                println("categoryList == " + listToJson(categoryList))
-
-                preferenceDataRepository.saveCategoryList(
-                    listToJson(categoryList)
-                )
-
             } catch (e: Exception) {
                 _todoListFromApi.postValue(BaseResult.Error(e))
             }
         }
+    }
+
+    /**
+     * Get all categories saved in the datastore
+     */
+    fun getCategoryList() = viewModelScope.launch {
+        _categoryList = preferenceDataRepository.getCategoryList()
     }
 }

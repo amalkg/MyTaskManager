@@ -15,6 +15,7 @@ import androidx.navigation.Navigator
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -89,6 +90,12 @@ fun capitalizeFirstLetter(input: String): String {
 fun listToJson(list: List<String>): String {
     val gson = Gson()
     return gson.toJson(list)
+}
+
+fun jsonToList(jsonString: String): ArrayList<String> {
+    val listType = object : TypeToken<List<String>>() {}.type
+    val gson = Gson()
+    return gson.fromJson(jsonString, listType)
 }
 
 fun String.convertDateToMilliseconds(): Long {

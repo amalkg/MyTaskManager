@@ -1,4 +1,4 @@
-package com.cns.mytaskmanager
+package com.cns.mytaskmanager.app
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

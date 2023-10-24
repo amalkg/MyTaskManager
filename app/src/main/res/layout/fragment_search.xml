@@ -92,9 +92,10 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:hint="@string/search"
-                            android:imeOptions="actionNext"
+                            android:imeOptions="actionSearch"
                             android:inputType="text|textCapSentences"
                             android:maxLength="150"
+                            app:fontFamily="@font/roboto_regular"
                             android:textColor="@color/color_black" />
 
                     </com.google.android.material.textfield.TextInputLayout>
