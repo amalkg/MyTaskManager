@@ -21,7 +21,7 @@ Task Manager App is a simple Android application that allows users to create, ma
 - Hilt
 - Data binding
 - Datastore
-- Alarm manager
+- Work manager
 - Local notification
 - Unit test
 
