@@ -8,6 +8,7 @@ import androidx.datastore.dataStore
 import com.cns.mytaskmanager.TodoList
 import com.cns.mytaskmanager.data.DataStoreRepository
 import com.cns.mytaskmanager.data.DefaultDataRepository
+import com.cns.mytaskmanager.data.PreferenceDataRepositoryImpl
 import com.google.protobuf.InvalidProtocolBufferException
 import dagger.Module
 import dagger.Provides
@@ -17,6 +18,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import java.io.InputStream
 import java.io.OutputStream
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -59,4 +61,8 @@ object DbModule {
             todoListDataStore
         )
     }
+
+    @Singleton
+    @Provides
+    fun providePreferenceDataStoreRepository(@ApplicationContext context: Context)= PreferenceDataRepositoryImpl(context)
 }

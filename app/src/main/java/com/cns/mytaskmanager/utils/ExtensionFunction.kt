@@ -14,6 +14,7 @@ import androidx.navigation.NavDirections
 import androidx.navigation.Navigator
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.findNavController
+import com.google.gson.Gson
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -68,6 +69,7 @@ fun Fragment.showKeyboard(view: View) {
         WindowCompat.getInsetsController(window, view).show(ime)
     }
 }
+
 fun isNetworkAvailable(context: Context) =
     (context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager).run {
         getNetworkCapabilities(activeNetwork)?.run {
@@ -82,6 +84,11 @@ fun capitalizeFirstLetter(input: String): String {
         return input
     }
     return input.substring(0, 1).uppercase() + input.substring(1)
+}
+
+fun listToJson(list: List<String>): String {
+    val gson = Gson()
+    return gson.toJson(list)
 }
 
 fun String.convertDateToMilliseconds(): Long {

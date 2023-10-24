@@ -89,6 +89,7 @@ dependencies {
     implementation(dependencyNotation = "com.squareup.okhttp3:okhttp:4.11.0")
     implementation(dependencyNotation = "com.squareup.okhttp3:logging-interceptor:4.9.0")
     implementation(dependencyNotation = "com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation(dependencyNotation = "com.google.code.gson:gson:2.9.0")
 
     //Coroutine
     implementation(dependencyNotation = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.2")
@@ -102,6 +103,7 @@ dependencies {
 
     //Datastore
     implementation(dependencyNotation = "androidx.datastore:datastore:1.0.0")
+    implementation(dependencyNotation = "androidx.datastore:datastore-preferences:1.0.0")
     implementation(dependencyNotation = "com.google.protobuf:protobuf-javalite:3.24.4")
 
     // WorkManager

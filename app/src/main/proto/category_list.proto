@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+option java_package = "com.cns.mytaskmanager";
+option java_multiple_files = true;
+
+message Category {
+  string categoryName = 1;
+}
+
+message CategoryList {
+  repeated Category category = 1;
+}

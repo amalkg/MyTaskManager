@@ -8,8 +8,10 @@ import com.cns.mytaskmanager.Todo
 import com.cns.mytaskmanager.data.BaseResult
 import com.cns.mytaskmanager.data.DataStoreRepository
 import com.cns.mytaskmanager.data.MainRepository
+import com.cns.mytaskmanager.data.PreferenceDataRepositoryImpl
 import com.cns.mytaskmanager.data.model.TaskListResponse
 import com.cns.mytaskmanager.utils.capitalizeFirstLetter
+import com.cns.mytaskmanager.utils.listToJson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,7 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val mainRepository: MainRepository,
-    private val dataRepository: DataStoreRepository
+    private val dataRepository: DataStoreRepository,
+    private val preferenceDataRepository: PreferenceDataRepositoryImpl
 ) :
     ViewModel() {
 
@@ -30,6 +33,8 @@ class HomeViewModel @Inject constructor(
     private lateinit var _todoList: LiveData<List<Todo>>
 
     val todoList: LiveData<List<Todo>> = _todoList
+
+    val categoryList: List<String> = emptyList()
 
     private val _todoListFromApi = MutableLiveData<BaseResult<Response<TaskListResponse>>>()
     val todoListFromApi: LiveData<BaseResult<Response<TaskListResponse>>> = _todoListFromApi
@@ -73,7 +78,10 @@ class HomeViewModel @Inject constructor(
                 _todoListFromApi.postValue(BaseResult.Success(result))
                 clearAllTodoList()
                 for (todo in result.body()?.todos!!) {
-                    println(todo.title)
+                    println("title" + todo.title)
+                    categoryList.toMutableList().add(
+                        capitalizeFirstLetter(todo.category)
+                    )
                     addTodoList(
                         listOf(
                             Todo.newBuilder()
@@ -89,6 +97,12 @@ class HomeViewModel @Inject constructor(
                         )
                     )
                 }
+
+                println("categoryList == " + listToJson(categoryList))
+
+                preferenceDataRepository.saveCategoryList(
+                    listToJson(categoryList)
+                )
 
             } catch (e: Exception) {
                 _todoListFromApi.postValue(BaseResult.Error(e))
